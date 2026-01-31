@@ -1,0 +1,199 @@
+{
+  "name": "Knowledge base",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "question"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -320,
+        0
+      ],
+      "id": "8ae244f3-aabe-44ea-849d-529f169eb516",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "file",
+        "operation": "get",
+        "owner": {
+          "__rl": true,
+          "value": "https://github.com/SarahGhanem/",
+          "mode": "url"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "AI-Sales-Agent",
+          "mode": "list",
+          "cachedResultName": "AI-Sales-Agent",
+          "cachedResultUrl": "https://github.com/SarahGhanem/AI-Sales-Agent"
+        },
+        "filePath": "Sarah_Ghanem_Knowledge_Base_Short.pdf",
+        "additionalParameters": {}
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        -96,
+        0
+      ],
+      "id": "f4ab712d-dd83-45b9-90d7-71581817d33e",
+      "name": "Get a file",
+      "webhookId": "bd3859dd-f135-4bb0-b9f0-0a4675c7eecd",
+      "credentials": {
+        "githubOAuth2Api": {
+          "id": "tym6mwYhMjhs0WFB",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        128,
+        0
+      ],
+      "id": "b87d777e-752c-4e91-b4bf-47c6adb1a364",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c00c8e35-728d-4a3a-a7b8-c8a0ba684120",
+              "name": "answer",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        0
+      ],
+      "id": "f06366fd-1e53-4185-a302-bba6f5354482",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "={{ $('When Executed by Another Workflow').item.json.question }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "instructions": "=answer only based on this {{ $json.text }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        336,
+        0
+      ],
+      "id": "bb57256f-0d8e-479a-891a-34b9ff73096d",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "gY3hITFQLoYwMyh5",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "question": "what are the courses"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "89286162-0cc1-42fe-9630-78b3428d2cdd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f3f0970730c1bdda7541d38442080f14e77492489accd1433bd52d9f8887803b"
+  },
+  "id": "rTfCFdh58S6UF8mV2m9cq",
+  "tags": []
+}
